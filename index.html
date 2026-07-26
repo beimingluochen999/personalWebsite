@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人主页</title>
+    <!-- 引入 FontAwesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #333;
+            --text-sub: #666;
+            --primary-color: #764ba2;
+            --hover-shadow: 0 8px 25px rgba(118, 75, 162, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .profile-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 420px;
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* 头像区域 */
+        .avatar-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 昵称与性别 */
+        .nickname {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .gender-icon {
+            font-size: 1rem;
+        }
+
+        .gender-male { color: #4a90e2; }
+        .gender-female { color: #ff69b4; }
+
+        /* 简介 */
+        .bio {
+            color: var(--text-sub);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            padding: 0 10px;
+        }
+
+        /* 社交链接区域 */
+        .social-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-main);
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .social-link:hover {
+            background: #fff;
+            border-color: var(--primary-color);
+            box-shadow: var(--hover-shadow);
+            transform: translateX(5px);
+        }
+
+        .social-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            margin-right: 15px;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        /* 平台专属颜色 */
+        .icon-telegram { background: #0088cc; }
+        .icon-qq { background: #12b7f5; }
+        .icon-github { background: #333; }
+        .icon-bilibili { background: #fb7299; }
+
+        .link-text {
+            flex: 1;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .link-arrow {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        /* QQ号复制提示 */
+        .qq-number {
+            font-family: monospace;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            margin-left: 5px;
+        }
+
+        /* Toast 提示框 */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 480px) {
+            .profile-card {
+                padding: 30px 20px;
+            }
+            .nickname {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 复制成功提示 -->
+    <div class="toast" id="toast">QQ号已复制到剪贴板</div>
+
+    <div class="profile-card">
+        <!-- 头像 -->
+        <div class="avatar-container">
+            <img src="https://avatars.githubusercontent.com/u/190189007?v=4" alt="头像" class="avatar">
+        </div>
+
+        <!-- 昵称与性别 -->
+        <h1 class="nickname">
+            北冥洛臣
+            <!-- 性别图标：男性用 fa-mars，女性用 fa-venus -->
+            <i class="fas fa-mars gender-icon gender-male"></i>
+        </h1>
+
+        <!-- 简介 -->
+        <p class="bio">
+            一个普普通通的二次元爱好者，社恐到去BW都没怎么和别人说话。但是欢迎交流！全平台同名
+        </p>
+
+        <!-- 社交链接 -->
+        <div class="social-links">
+            <!-- Telegram -->
+            <a href="https://t.me/beimingluochen" target="_blank" class="social-link">
+                <div class="social-icon icon-telegram">
+                    <i class="fab fa-telegram-plane"></i>
+                </div>
+                <span class="link-text">Telegram</span>
+                <i class="fas fa-chevron-right link-arrow"></i>
+            </a>
+
+            <!-- QQ (点击复制) -->
+            <!-- ⚠️ 请将下方 data-qq 属性修改为您的真实QQ号 -->
+            <div class="social-link" id="qqBtn" data-qq="3070813013" style="cursor: pointer;">
+                <div class="social-icon icon-qq">
+                    <i class="fab fa-qq"></i>
+                </div>
+                <span class="link-text">
+                    QQ
+                    <span class="qq-number">点击复制</span>
+                </span>
+                <i class="fas fa-copy link-arrow"></i>
+            </div>
+
+            <!-- GitHub -->
+            <a href="https://github.com/beimingluochen999" target="_blank" class="social-link">
+                <div class="social-icon icon-github">
+                    <i class="fab fa-github"></i>
+                </div>
+                <span class="link-text">GitHub</span>
+                <i class="fas fa-chevron-right link-arrow"></i>
+            </a>
+
+            <!-- Bilibili -->
+            <a href="https://space.bilibili.com/621012506" target="_blank" class="social-link">
+                <div class="social-icon icon-bilibili">
+                    <i class="fab fa-bilibili"></i>
+                </div>
+                <span class="link-text">Bilibili</span>
+                <i class="fas fa-chevron-right link-arrow"></i>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // QQ号点击复制功能
+        document.getElementById('qqBtn').addEventListener('click', function() {
+            const qqNumber = this.getAttribute('data-qq');
+            const toast = document.getElementById('toast');
+
+            // 复制到剪贴板
+            navigator.clipboard.writeText(qqNumber).then(() => {
+                // 显示提示
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2000);
+            }).catch(err => {
+                // 降级方案：如果clipboard API不可用，使用传统方法
+                const textArea = document.createElement('textarea');
+                textArea.value = qqNumber;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                } catch (err) {
+                    alert('复制失败，请手动复制：' + qqNumber);
+                }
+                document.body.removeChild(textArea);
+            });
+        });
+    </script>
+</body>
+</html>
